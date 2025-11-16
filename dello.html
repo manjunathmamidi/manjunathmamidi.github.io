@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Modern Auth UI</title>
+  <!-- Google Font for a modern look -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+        integrity="sha512-tva0GdSVUr0n8bRYa9Tr4mZny+XJ7wT6UqP2RqGZDHL0Ix3MnyTb2cV+HEnZnQhrH5z0cJ9B+rmN4M+7r5Z6dQ==" 
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root {
+      --primary-color: #1976d2;
+      --primary-hover: #1565c0;
+      --accent-color: #ff4b2b;
+      --bg-overlay: rgba(0,0,0,0.5);
+      --font-family: 'Roboto', sans-serif;
+    }
+    /* Reset & Base */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family);
+      background: url("https://as2.ftcdn.net/v2/jpg/02/48/17/51/1000_F_248175189_9j4bZw7WwkttDumepYd7hceSul8742X3.jpg") 
+                  no-repeat center center fixed;
+      background-size: cover;
+      min-height: 100vh;
+      position: relative;
+    }
+    /* Dark overlay for readability */
+    .overlay-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--bg-overlay);
+      z-index: -1;
+    }
+    /* Top Navigation */
+    .top-buttons {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .top-buttons button {
+      padding: 12px 24px;
+      margin: 0 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 30px;
+      background: var(--primary-color);
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .top-buttons button:hover {
+      background: var(--primary-hover);
+    }
+    /* Main Container */
+    .container {
+      position: relative;
+      width: 700px;
+      height: 500px;
+      margin: 10px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      overflow: hidden;
+      display: flex;
+    }
+    /* Form Panels */
+    .form-panel {
+      width: 50%;
+      padding: 40px 30px;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .sign-in-panel {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .sign-up-panel {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+    .container.active .sign-in-panel {
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+    .container.active .sign-up-panel {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .form-panel h2 {
+      margin-bottom: 20px;
+      font-size: 28px;
+      color: #333;
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .form-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 12px 12px 40px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: border 0.3s;
+    }
+    .form-group input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+    .form-group label {
+      font-size: 14px;
+      color: #555;
+    }
+    .remember-me {
+      font-size: 14px;
+      color: #555;
+      margin-left: 5px;
+    }
+    .form-panel button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      background: var(--primary-color);
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .form-panel button:hover {
+      background: var(--primary-hover);
+      transform: scale(1.02);
+    }
+    /* Captcha Styling */
+    .captcha-container {
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+    .captcha-container img {
+      height: 45px;
+      margin-right: 10px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      object-fit: cover;
+    }
+    .captcha-container span {
+      font-size: 14px;
+      color: #555;
+      cursor: pointer;
+    }
+    /* Overlay: Laptop Image */
+    .overlay {
+      position: absolute;
+      width: 300px;
+      height: 100%;
+      top: 0;
+      left: 400px;
+      transition: left 0.5s ease;
+      z-index: 2;
+      overflow: hidden;
+    }
+    .overlay img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* Active overlay: slides to cover sign-in panel */
+    .container.active .overlay {
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay-bg"></div>
+  <!-- Navigation Buttons -->
+  <div class="top-buttons">
+    <button id="showSignIn">SIGN IN</button>
+    <button id="showSignUp">SIGN UP</button>
+  </div>
+  <!-- Auth Container -->
+  <div class="container" id="authContainer">
+    <!-- Sign In Panel -->
+    <div class="form-panel sign-in-panel">
+      <h2>Sign In</h2>
+      <form action="#" method="post">
+        <div class="form-group">
+          <i class="fa fa-user"></i>
+          <input type="text" placeholder="Username" required>
+        </div>
+        <div class="form-group">
+          <i class="fa fa-lock"></i>
+          <input type="password" placeholder="Password" required>
+        </div>
+        <div class="form-group">
+          <input type="checkbox" id="remember">
+          <label for="remember" class="remember-me">Remember Me</label>
+        </div>
+        <button type="submit">Sign In</button>
+      </form>
+    </div>
+    <!-- Sign Up Panel -->
+    <div class="form-panel sign-up-panel">
+      <h2>Sign Up</h2>
+      <form action="#" method="post">
+        <div class="form-group">
+          <i class="fa fa-user-plus"></i>
+          <input type="text" placeholder="Username" required>
+        </div>
+        <div class="form-group">
+          <i class="fa fa-lock"></i>
+          <input type="password" placeholder="Password" required>
+        </div>
+        <div class="form-group">
+          <i class="fa fa-lock"></i>
+          <input type="password" placeholder="Confirm Password" required>
+        </div>
+        <div class="form-group">
+          <i class="fa fa-shield-alt"></i>
+          <input type="text" placeholder="Enter Captcha" required>
+        </div>
+        <div class="captcha-container">
+          <img id="captchaImage" src="#" alt="Captcha" title="Click to refresh captcha">
+          <span id="refreshCaptcha"><i class="fa fa-sync-alt"></i> Refresh</span>
+        </div>
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
+    <!-- Overlay: Laptop Image -->
+    <div class="overlay">
+      <img src="https://image.freepik.com/free-photo/man-working-laptop_53876-20895.jpg" alt="Laptop">
+    </div>
+  </div>
+  <script>
+    const authContainer = document.getElementById('authContainer');
+    const showSignIn = document.getElementById('showSignIn');
+    const showSignUp = document.getElementById('showSignUp');
+    // Toggle active state on container to slide panels and overlay
+    showSignIn.addEventListener('click', () => {
+      authContainer.classList.remove('active');
+    });
+    showSignUp.addEventListener('click', () => {
+      authContainer.classList.add('active');
+    });
+    // Dummy captcha refresh (update src as needed)
+    const captchaImage = document.getElementById('captchaImage');
+    const refreshCaptcha = document.getElementById('refreshCaptcha');
+    function refreshCaptchaFunc() {
+      // For UI demo, just change the src to a random query (replace with real captcha URL in production)
+      captchaImage.src = 'https://via.placeholder.com/200x70?text=' + Date.now();
+    }
+    captchaImage.addEventListener('click', refreshCaptchaFunc);
+    refreshCaptcha.addEventListener('click', refreshCaptchaFunc);
+  </script>
+</body>
+</html>
